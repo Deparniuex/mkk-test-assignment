@@ -1,0 +1,42 @@
+package impl
+
+import (
+	"context"
+	"time"
+	"tracker/internal/auth"
+	"tracker/internal/user"
+)
+
+type authImpl struct {
+	userRepository user.Repository
+	jwtSecret      []byte
+	tokenTTL       time.Duration
+}
+
+func NewAuthUC(user user.Repository) auth.AuthUC {
+	return &authImpl{userRepository: user}
+}
+
+func (a *authImpl) Authenticate(ctx context.Context, email string, password string) (string, error) {
+	user, err := a.userRepository.GetUserByEmail(ctx, email)
+	if err != nil {
+		return "", err
+	}
+	err = user.ComparePassword(password)
+	if err != nil {
+		return "", auth.ErrInvalidCredentials
+	}
+	token, err := auth.GenerateToken(user.ID, a.jwtSecret, a.tokenTTL)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
+}
+
+func (a *authImpl) VerifyToken(ctx context.Context, token string) error {
+	err := auth.ParseToken(a.jwtSecret, token)
+	if err != nil {
+		return err
+	}
+	return nil
+}

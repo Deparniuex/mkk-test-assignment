@@ -8,12 +8,6 @@ type Response struct {
 	Body    any    `json:"body,omitempty"`
 }
 
-const (
-	BadRequestMessage          = "Bad request"
-	InternalServerErrorMessage = "Internal server error"
-	NotFoundMessage            = "Resource not found"
-)
-
 func WriteResponse(ctx *gin.Context, status int, message string) {
 	ctx.JSON(status, &Response{
 		Code:    status,

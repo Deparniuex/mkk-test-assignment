@@ -1,13 +1,15 @@
 package http
 
 import (
-	"tracker/internal/config"
-
 	"github.com/gin-gonic/gin"
 )
 
-func newRouter(_ *config.Config, handlers Handlers) *gin.Engine {
+func newRouter(h Handlers) *gin.Engine {
 	r := gin.Default()
-	// ENDPOINTS
+	v1 := r.Group("/api/v1")
+	{
+		v1.POST("/register", h.User.CreateUser)
+		v1.POST("/login", h.Auth.LogIn)
+	}
 	return r
 }

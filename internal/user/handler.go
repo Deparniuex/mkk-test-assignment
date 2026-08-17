@@ -20,7 +20,7 @@ func NewUserHandler(userUC UserUC) *UserHandler {
 
 type createUserRequest struct {
 	Name     string `json:"name" binding:"required,min=2,max=50" example:"John Doe"`
-	Email    string `json:"email"    binding:"required,min=2,max=50" example:"dep2and@gmail.com"`
+	Email    string `json:"email"    binding:"required,min=2,max=50" example:"example@gmail.com"`
 	Password string `json:"password" binding:"required,min=6,max=32" example:"qwerty"`
 }
 
@@ -53,6 +53,6 @@ func (h *UserHandler) CreateUser(ctx *gin.Context) {
 
 	ctx.JSON(http.StatusCreated, &response.Response{
 		Code:    http.StatusCreated,
-		Message: "user succesfully created",
+		Message: "user successfully created",
 	})
 }

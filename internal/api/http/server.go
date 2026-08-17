@@ -5,25 +5,29 @@ import (
 	"fmt"
 	"net/http"
 	"time"
-	"tracker/internal/config"
 
 	"github.com/gin-gonic/gin"
 )
 
+type Config struct {
+	Host string `env:"REDIS_HOST" envDefault:"localhost:6379"`
+	Port string `env:"PORT" envDefault:"8080"`
+}
+
 type Server struct {
-	config *config.Config
+	config *Config
 	server *http.Server
 	notify chan error
 }
 
-func NewServer(cfg *config.Config, handlers Handlers) *Server {
+func NewServer(cfg *Config, handlers Handlers) *Server {
 	gin.SetMode(gin.DebugMode)
 
-	router := newRouter(cfg, handlers)
+	router := newRouter(handlers)
 
 	return &Server{
 		server: &http.Server{
-			Addr:    fmt.Sprintf(":%d", cfg.HttpPort),
+			Addr:    fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
 			Handler: router.Handler(),
 		},
 		config: cfg,
