@@ -25,10 +25,9 @@ func (r *repository) CreateUser(ctx context.Context, user *user.UserModel) error
 		email,
 	    password_hash,
 	    name,
-		created_at,
+		created_at
 	)
-	VALUES ($1, $2, $3, $4)
-	RETURNING id
+	VALUES (?, ?, ?, ?)
     `, usersTable)
 	_, err := r.mysql.ExecContext(ctx, query, user.Email, user.PasswordHash, user.Name, user.CreatedAt)
 	if err != nil {
@@ -39,7 +38,7 @@ func (r *repository) CreateUser(ctx context.Context, user *user.UserModel) error
 
 func (r *repository) GetUserByID(ctx context.Context, id uint) (*user.UserModel, error) {
 	query := fmt.Sprintf(`
-		SELECT * FROM %s WHERE id = $1
+		SELECT * FROM %s WHERE id = ?
 	`, usersTable)
 	user := &user.UserModel{}
 	err := r.mysql.QueryRowContext(ctx, query, id).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Name, &user.CreatedAt)
@@ -55,7 +54,7 @@ func (r *repository) GetUserByID(ctx context.Context, id uint) (*user.UserModel,
 
 func (r *repository) GetUserByEmail(ctx context.Context, email string) (*user.UserModel, error) {
 	query := fmt.Sprintf(`
-		SELECT * FROM %s WHERE email = $1
+		SELECT * FROM %s WHERE email = ?
 	`, usersTable)
 	user := &user.UserModel{}
 	err := r.mysql.QueryRowContext(ctx, query, email).Scan(&user.ID, &user.Email, &user.PasswordHash, &user.Name, &user.CreatedAt)
