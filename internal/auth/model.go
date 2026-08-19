@@ -17,7 +17,7 @@ func GenerateToken(userID uint, secret []byte, ttl time.Duration) (string, error
 	claims := Claims{
 		UserID: userID,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl)),
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(ttl * time.Second)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 		},
 	}
@@ -29,7 +29,7 @@ func GenerateToken(userID uint, secret []byte, ttl time.Duration) (string, error
 	return tokenString, nil
 }
 
-func ParseToken(secret []byte, tokenStr string) error {
+func ParseToken(secret []byte, tokenStr string) (*Claims, error) {
 	claims := &Claims{}
 
 	token, err := jwt.ParseWithClaims(tokenStr, claims, func(token *jwt.Token) (interface{}, error) {
@@ -41,13 +41,13 @@ func ParseToken(secret []byte, tokenStr string) error {
 	if err != nil {
 		switch {
 		case errors.Is(err, jwt.ErrTokenExpired):
-			return ErrTokenExpired
+			return nil, ErrTokenExpired
 		default:
-			return err
+			return nil, err
 		}
 	}
 	if !token.Valid {
-		return ErrInvalidToken
+		return nil, ErrInvalidToken
 	}
-	return nil
+	return claims, nil
 }

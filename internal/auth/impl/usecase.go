@@ -33,10 +33,10 @@ func (a *authImpl) Authenticate(ctx context.Context, email string, password stri
 	return token, nil
 }
 
-func (a *authImpl) VerifyToken(ctx context.Context, token string) error {
-	err := auth.ParseToken(a.jwtSecret, token)
+func (a *authImpl) VerifyToken(ctx context.Context, token string) (uint, error) {
+	claims, err := auth.ParseToken(a.jwtSecret, token)
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return claims.UserID, nil
 }

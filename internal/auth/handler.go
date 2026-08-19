@@ -3,6 +3,8 @@ package auth
 import (
 	"errors"
 	"net/http"
+	"strings"
+	"tracker/internal/base/database"
 	"tracker/internal/base/response"
 
 	"github.com/gin-gonic/gin"
@@ -29,8 +31,14 @@ func (h *AuthHandler) LogIn(ctx *gin.Context) {
 	}
 	token, err := h.authUC.Authenticate(ctx, req.Email, req.Password)
 	if err != nil {
-		response.WriteResponse(ctx, http.StatusInternalServerError, err.Error())
-		return
+		switch {
+		case errors.Is(err, database.ErrNotFound):
+			response.WriteResponse(ctx, http.StatusNotFound, err.Error())
+			return
+		default:
+			response.WriteResponse(ctx, http.StatusInternalServerError, err.Error())
+			return
+		}
 	}
 	tokenStruct := gin.H{
 		"token": token,
@@ -42,10 +50,11 @@ func (h *AuthHandler) LogIn(ctx *gin.Context) {
 	})
 }
 
-func (h *AuthHandler) VerifyToken(ctx *gin.Context) gin.HandlerFunc {
-	return func(c *gin.Context) {
+func (h *AuthHandler) VerifyToken() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
 		token := ctx.GetHeader("Authorization")
-		err := h.authUC.VerifyToken(ctx, token)
+		tokenStr := strings.TrimPrefix(token, "Bearer ")
+		userID, err := h.authUC.VerifyToken(ctx, tokenStr)
 		if err != nil {
 			switch {
 			case errors.Is(err, ErrInvalidToken):
@@ -67,6 +76,8 @@ func (h *AuthHandler) VerifyToken(ctx *gin.Context) gin.HandlerFunc {
 				return
 			}
 		}
+
+		ctx.Set("userID", userID)
 		ctx.Next()
 	}
 }
