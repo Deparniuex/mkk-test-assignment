@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"fmt"
+	"time"
 
 	"github.com/go-sql-driver/mysql"
 	_ "github.com/go-sql-driver/mysql"
@@ -28,9 +29,12 @@ func NewMySQlConnection(cfg *MySQLConfig) (*sql.DB, error) {
 
 func toLibConfig(cfg *MySQLConfig) *mysql.Config {
 	return &mysql.Config{
-		Addr:   fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
-		DBName: cfg.DBName,
-		User:   cfg.Username,
-		Passwd: cfg.Password,
+		Addr:      fmt.Sprintf("%s:%s", cfg.Host, cfg.Port),
+		Net:       "tcp",
+		DBName:    cfg.DBName,
+		User:      cfg.Username,
+		Passwd:    cfg.Password,
+		ParseTime: true,
+		Loc:       time.Local,
 	}
 }
