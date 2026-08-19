@@ -1,6 +1,7 @@
 package config
 
 import (
+	"time"
 	"tracker/internal/api/http"
 	"tracker/internal/base/database"
 
@@ -8,9 +9,11 @@ import (
 )
 
 type Config struct {
-	Server *http.Config
-	MySQL  *database.MySQLConfig
-	Redis  *database.RedisConfig
+	Server    *http.Config
+	MySQL     *database.MySQLConfig
+	Redis     *database.RedisConfig
+	JWTSecret []byte
+	TokenTTL  time.Duration
 }
 
 func LoadConfig() (*Config, error) {
@@ -39,5 +42,7 @@ func LoadConfig() (*Config, error) {
 			Password: viper.GetString("REDIS_PASSWORD"),
 			DB:       viper.GetInt("REDIS_DB"),
 		},
+		JWTSecret: []byte(viper.GetString("JWT_SECRET")),
+		TokenTTL:  viper.GetDuration("TOKEN_TTL"),
 	}, nil
 }

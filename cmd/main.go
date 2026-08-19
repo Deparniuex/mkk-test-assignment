@@ -26,7 +26,7 @@ func main() {
 	userRepository := userImpl.NewUserRepository(mySQlDB)
 
 	userUC := userImpl.NewUserUC(userRepository)
-	authUC := authImpl.NewAuthUC(userUC)
+	authUC := authImpl.NewAuthUC(userUC, cfg.JWTSecret, cfg.TokenTTL)
 
 	userHandler := user.NewUserHandler(userUC)
 	authHandler := auth.NewAuthHandler(authUC)

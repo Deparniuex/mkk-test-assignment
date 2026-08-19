@@ -13,8 +13,8 @@ type authImpl struct {
 	tokenTTL       time.Duration
 }
 
-func NewAuthUC(user user.Repository) auth.AuthUC {
-	return &authImpl{userRepository: user}
+func NewAuthUC(user user.Repository, jwtSecret []byte, tokenTTL time.Duration) auth.AuthUC {
+	return &authImpl{userRepository: user, jwtSecret: jwtSecret, tokenTTL: tokenTTL}
 }
 
 func (a *authImpl) Authenticate(ctx context.Context, email string, password string) (string, error) {
