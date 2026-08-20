@@ -2,7 +2,6 @@ package user
 
 import (
 	"net/http"
-	"time"
 	"tracker/internal/base/response"
 
 	"github.com/gin-gonic/gin"
@@ -34,9 +33,8 @@ func (h *UserHandler) CreateUser(ctx *gin.Context) {
 	}
 
 	user := UserModel{
-		Name:      req.Name,
-		Email:     req.Email,
-		CreatedAt: time.Now(),
+		Name:  req.Name,
+		Email: req.Email,
 	}
 
 	err = user.SetPassword(req.Password)

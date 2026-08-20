@@ -24,12 +24,11 @@ func (r *repository) CreateUser(ctx context.Context, user *user.UserModel) error
 	INSERT INTO %s (
 		email,
 	    password_hash,
-	    name,
-		created_at
+	    name
 	)
-	VALUES (?, ?, ?, ?)
+	VALUES (?, ?, ?)
     `, usersTable)
-	_, err := r.mysql.ExecContext(ctx, query, user.Email, user.PasswordHash, user.Name, user.CreatedAt)
+	_, err := r.mysql.ExecContext(ctx, query, user.Email, user.PasswordHash, user.Name)
 	if err != nil {
 		return err
 	}
