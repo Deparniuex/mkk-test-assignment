@@ -56,7 +56,9 @@ func (h *TeamHandler) GetTeams(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, &response.Response{
 		Code:    http.StatusOK,
 		Message: "teams successfully retrieved",
-		Body:    teams,
+		Body: gin.H{
+			"teams": teams,
+		},
 	})
 }
 
