@@ -6,7 +6,7 @@ import (
 )
 
 type Repository interface {
-	CreateTeam(ctx context.Context, team *model.Team) error
+	CreateTeam(ctx context.Context, team *model.Team) (uint, error)
 	GetMember(ctx context.Context, userID uint, teamID uint) (*model.TeamMember, error)
 	GetTeamsByUser(ctx context.Context, userID uint) ([]*model.Team, error)
 	InviteUser(ctx context.Context, userID uint, teamID uint, newMember uint, role model.Role) error

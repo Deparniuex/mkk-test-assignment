@@ -20,11 +20,13 @@ func NewTeamUC(teamRepo team.Repository, userRepo user.Repository) team.UC {
 	}
 }
 
-func (t *usecase) CreateTeam(ctx context.Context, team *model.Team) error {
-	if err := t.teamRepo.CreateTeam(ctx, team); err != nil {
-		return err
+func (t *usecase) CreateTeam(ctx context.Context, team *model.Team) (uint, error) {
+	teamID, err := t.teamRepo.CreateTeam(ctx, team)
+	if err != nil {
+		return 0, err
 	}
-	return nil
+
+	return teamID, nil
 }
 
 func (t *usecase) GetTeamsByUser(ctx context.Context, userID uint) ([]*model.Team, error) {

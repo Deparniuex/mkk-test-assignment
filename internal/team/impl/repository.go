@@ -20,7 +20,7 @@ func NewTeamRepository(db *sql.DB) team.Repository {
 var teamTable = "teams"
 var teamMemberTable = "team_members"
 
-func (r *repository) CreateTeam(ctx context.Context, tm *model.Team) error {
+func (r *repository) CreateTeam(ctx context.Context, tm *model.Team) (uint, error) {
 	queryTeam := fmt.Sprintf(`
 	INSERT INTO %s (
 	                name, 
@@ -39,26 +39,26 @@ func (r *repository) CreateTeam(ctx context.Context, tm *model.Team) error {
 	`, teamMemberTable)
 	tx, err := r.db.BeginTx(ctx, nil)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	defer tx.Rollback()
 	res, execErr := tx.ExecContext(ctx, queryTeam, tm.Name, tm.CreatedBy)
 	if execErr != nil {
-		return execErr
+		return 0, execErr
 	}
 	teamID, err := res.LastInsertId()
 	if err != nil {
-		return err
+		return 0, err
 	}
 	_, execErr = tx.ExecContext(ctx, queryMember, teamID, tm.CreatedBy, model.Owner)
 	if execErr != nil {
-		return execErr
+		return 0, execErr
 	}
 	err = tx.Commit()
 	if err != nil {
-		return err
+		return 0, err
 	}
-	return nil
+	return uint(teamID), nil
 }
 
 func (r *repository) GetTeamsByUser(ctx context.Context, userID uint) ([]*model.Team, error) {

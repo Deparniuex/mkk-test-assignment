@@ -31,7 +31,7 @@ func (h *TeamHandler) CreateTeam(ctx *gin.Context) {
 	}
 	userID := ctx.GetUint("userID")
 	team := model.Team{Name: req.Name, CreatedBy: userID}
-	err := h.TeamUC.CreateTeam(ctx, &team)
+	teamID, err := h.TeamUC.CreateTeam(ctx, &team)
 	if err != nil {
 		response.WriteResponse(ctx, http.StatusInternalServerError, err.Error())
 		return
@@ -40,6 +40,9 @@ func (h *TeamHandler) CreateTeam(ctx *gin.Context) {
 	ctx.JSON(http.StatusCreated, &response.Response{
 		Code:    http.StatusCreated,
 		Message: "team successfully created",
+		Body: gin.H{
+			"teamID": teamID,
+		},
 	})
 }
 
