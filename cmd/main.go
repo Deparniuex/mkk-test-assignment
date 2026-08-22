@@ -11,6 +11,8 @@ import (
 	authImpl "tracker/internal/auth/impl"
 	"tracker/internal/base/database"
 	"tracker/internal/config"
+	"tracker/internal/task"
+	taskImpl "tracker/internal/task/impl"
 	"tracker/internal/team"
 	teamImpl "tracker/internal/team/impl"
 	"tracker/internal/user"
@@ -31,19 +33,23 @@ func main() {
 	}
 	userRepository := userImpl.NewUserRepository(mySQlDB)
 	teamRepository := teamImpl.NewTeamRepository(mySQlDB)
+	taskRepository := taskImpl.NewTaskRepository(mySQlDB)
 
 	userUC := userImpl.NewUserUC(userRepository)
 	authUC := authImpl.NewAuthUC(userUC, cfg.JWTSecret, cfg.TokenTTL)
 	teamUC := teamImpl.NewTeamUC(teamRepository, userUC)
+	taskUC := taskImpl.NewTaskUC(teamRepository, userRepository, taskRepository)
 
 	userHandler := user.NewUserHandler(userUC)
 	authHandler := auth.NewAuthHandler(authUC)
 	teamHandler := team.NewTeamHandler(teamUC)
+	taskHandler := task.NewTaskHandler(taskUC)
 
 	server := http.NewServer(cfg.Server, http.Handlers{
 		User: userHandler,
 		Auth: authHandler,
 		Team: teamHandler,
+		Task: taskHandler,
 	})
 
 	server.Start()

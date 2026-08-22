@@ -14,6 +14,9 @@ func newRouter(h Handlers) *gin.Engine {
 		v1.POST("/teams", h.Auth.VerifyToken(), h.Team.CreateTeam)
 		v1.GET("/teams", h.Auth.VerifyToken(), h.Team.GetTeams)
 		v1.POST("/teams/:id/invite", h.Auth.VerifyToken(), h.Team.InviteUser)
+
+		v1.POST("/tasks", h.Auth.VerifyToken(), h.Task.CreateTask)
+		v1.GET("/tasks", h.Auth.VerifyToken(), h.Task.GetTasks)
 	}
 	return r
 }
